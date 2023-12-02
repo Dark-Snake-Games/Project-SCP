@@ -6,6 +6,8 @@ from random import randint
 
 from DSEngine.animated import AnimationSheet
 default_title="Project: SCP"
+click_sound = AudioPlayer("beep.mp3")
+AUDIO_MAN = AudioManager(click=click_sound)
 
 class SCP999(AnimatedSprite2D):
     def __init__(self, position=...):
@@ -31,9 +33,8 @@ class SCP999(AnimatedSprite2D):
         super().render(window)
 
 def main_menu():
-    global default_title
+    global default_title, AUDIO_MAN
     window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
-    audio_man = AudioManager()
     text = Text2D("Project: SCP", position=Vector2(530, 150))
     play_button = Button("Play", position=Vector2(595, 280))
     exit_button = Button("Exit", position=Vector2(600, 380))
@@ -46,10 +47,35 @@ def main_menu():
             #exit(1)
             pass
         elif play_button.pressed:
-            scp_999_scene()
-            play_button.pressed = False
+            AUDIO_MAN.play("click")
+            hub()
         elif exit_button.pressed:
+            AUDIO_MAN.play("click")
             exit(1)
+        else:
+            #print("Nothing pressed")
+            pass
+
+def hub():
+    global default_title, AUDIO_MAN
+    window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
+    text = Text2D("Hub", position=Vector2(600, 0))
+    scp999_button = Button("SCP-999", position=Vector2(0, 100))
+    main_menu_button = Button("Main Menu", position=Vector2(0, scp999_button.rect.bottom-50))
+    text.init(window)
+    scp999_button.init(window)
+    main_menu_button.init(window)
+    while window.running:
+        keys = window.frame()
+        if keys[27]:
+            #exit(1)
+            pass
+        elif scp999_button.pressed:
+            AUDIO_MAN.play("click")
+            scp_999_scene()
+        elif main_menu_button.pressed:
+            AUDIO_MAN.play("click")
+            main_menu()
         else:
             #print("Nothing pressed")
             pass
