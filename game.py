@@ -53,7 +53,7 @@ def hub():
         keys = window.frame()
         if keys[27]:
             AUDIO_MAN.play("click")
-            return 1
+            #return 1
         elif scp999_button.pressed:
             AUDIO_MAN.play("click")
             scp_999_scene()
