@@ -46,8 +46,8 @@ def hub():
     while window.running:
         keys = window.frame()
         if keys[27]:
-            #exit(1)
-            pass
+            AUDIO_MAN.play("click")
+            return 1
         elif scp999_button.pressed:
             AUDIO_MAN.play("click")
             scp_999_scene()
@@ -59,17 +59,23 @@ def hub():
             pass
 
 def scp_999_scene():
-    global default_title
+    global default_title, AUDIO_MAN
     window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
-    audio_man = AudioManager()
+    exit_button = Button("Hub", position=Vector2(0, 0))
+    exit_button.rect.right = 720
     text = Text2D("SCP-999", position=Vector2(550, 0))
     scp = SCP999(position=Vector2(640, 360))
     text.init(window)
     scp.init(window)
+    exit_button.init(window)
     scp.move_towards(Vector2(0, 0))
     while window.running:
         keys = window.frame()
+        if exit_button.pressed:
+            AUDIO_MAN.play("click")
+            hub()
         if keys[27]:
+            AUDIO_MAN.play("click")
             return 1
 
 if __name__ == "__main__":
