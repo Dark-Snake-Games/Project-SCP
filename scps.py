@@ -3,7 +3,7 @@ from pygame import Vector2
 from random import randint
 
 class SCP999(AnimatedSprite2D):
-    def __init__(self, position=...):
+    def __init__(self, position=Vector2(0, 0)):
         SCP999_1 = Image2D("Test.png")
         SCP999_2 = Image2D("Test1.png")
         walk_sheet = Spritesheet(0, SCP999_1,SCP999_1,SCP999_1,SCP999_1,SCP999_1,SCP999_1,SCP999_1,SCP999_1,SCP999_1,SCP999_1,SCP999_1,SCP999_1,\

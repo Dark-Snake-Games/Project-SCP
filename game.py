@@ -1,14 +1,20 @@
 from DSEngine import *
 from pygame import Vector2
-from pygame.display import update
+import pygame
 from sys import exit
 from random import randint
 from scps import SCP999
 
 from DSEngine.animated import AnimationSheet
+pygame.init()
 default_title="Project: SCP"
 click_sound = AudioPlayer("beep.mp3")
 AUDIO_MAN = AudioManager(click=click_sound)
+SCPS = {}
+
+def init():
+    global SCPS
+    SCPS = {"999": SCP999(Vector2(640, 360))}
 
 def main_menu():
     global default_title, AUDIO_MAN
@@ -59,21 +65,33 @@ def hub():
             pass
 
 def scp_999_scene():
-    global default_title, AUDIO_MAN
+    global default_title, AUDIO_MAN, SCPS
     window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
+    init()
     exit_button = Button("Hub", position=Vector2(0, 0))
-    exit_button.rect.right = 720
+    wall_left = Rect2D(1, position=Vector2(0, 0), size=Vector2(5, 720))
+    wall_right = Rect2D(1, position=Vector2(1275, 0), size=Vector2(5, 720))
+    wall_up = Rect2D(1, position=Vector2(0, 0), size=Vector2(1280, 5))
+    wall_down = Rect2D(1, position=Vector2(0, 715), size=Vector2(1280, 5))
     text = Text2D("SCP-999", position=Vector2(550, 0))
-    scp = SCP999(position=Vector2(640, 360))
+    scp = SCPS["999"]
     text.init(window)
     scp.init(window)
     exit_button.init(window)
-    scp.move_towards(Vector2(0, 0))
+    wall_left.init(window)
+    wall_right.init(window)
+    wall_up.init(window)
+    wall_down.init(window)
+    rx = randint(0, window.size[0])
+    ry = randint(0, window.size[1])
+    pos = Vector2(rx, ry)
+    scp.move_towards(pos)
     while window.running:
         keys = window.frame()
+        SCPS["999"] = scp
         if exit_button.pressed:
             AUDIO_MAN.play("click")
-            hub()
+            return 1
         if keys[27]:
             AUDIO_MAN.play("click")
             return 1
