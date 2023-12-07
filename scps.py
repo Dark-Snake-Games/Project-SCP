@@ -2,6 +2,34 @@ from DSEngine import *
 from pygame import Vector2
 from random import randint
 
+class Generator:
+    def __init__(self, total_power: float):
+        self.total_pow = total_power
+        self.consuming_power = 0.0
+        self.blackout = False
+
+    def calc(self):
+        if self.consuming_power > self.total_pow/2:
+            self.blackout = True
+        else:
+            self.blackout = False
+
+class PowerUser:
+    def __init__(self, generator, power: float):
+        self.con = False
+        self.consuming = power
+        self.generator = generator
+
+    def add_power_con(self):
+        if not self.con:
+            self.generator.consuming_power += self.consuming
+            self.con = True
+
+    def remove_power_con(self):
+        if self.con:
+            self.generator.consuming_power -= self.consuming
+            self.con = False
+
 class SCP999(AnimatedSprite2D):
     def __init__(self, position=Vector2(0, 0)):
         SCP999_1 = Image2D("Test.png")

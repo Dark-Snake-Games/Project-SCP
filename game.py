@@ -3,18 +3,50 @@ from pygame import Vector2
 import pygame
 from sys import exit
 from random import randint
-from scps import SCP999
-
+from scps import SCP999, Generator, PowerUser
 from DSEngine.animated import AnimationSheet
 pygame.init()
 default_title="Project: SCP"
 click_sound = AudioPlayer("beep.mp3")
 AUDIO_MAN = AudioManager(click=click_sound)
 SCPS = {}
+GENERATOR = Generator(100)
+
+def global_frame():
+    global GENERATOR
+    GENERATOR.calc()
+    print(GENERATOR.blackout)
 
 def init():
     global SCPS
     SCPS = {"999": SCP999(Vector2(640, 360))}
+
+def power_generator_room():
+    global default_title, AUDIO_MAN, GENERATOR
+    window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
+    text = Text2D("Power Generators", position=Vector2(530, 0))
+    gen1 = Rect2D(1, position=Vector2(70, 70), size=Vector2(160, 160), color=(160, 160, 160))
+    text1 = Text2D("Gen 1", position=Vector2(70, 70))
+    exit_button = Button("Hub", position=Vector2(0, 0))
+    power_tracker = PowerUser(GENERATOR, 65)
+    power_tracker.add_power_con()
+    text.init(window)
+    exit_button.init(window)
+    gen1.init(window)
+    text1.init(window)
+    while window.running:
+        keys = window.frame()
+        global_frame()
+        if keys[27]:
+            #exit(1)
+            pass
+        elif exit_button.pressed:
+            AUDIO_MAN.play("click")
+            return 1 
+        else:
+            #print("Nothing pressed")
+            pass
+
 
 def main_menu():
     global default_title, AUDIO_MAN
@@ -88,6 +120,7 @@ def scp_999_scene():
     scp.move_towards(pos)
     while window.running:
         keys = window.frame()
+        global_frame()
         SCPS["999"] = scp
         if exit_button.pressed:
             AUDIO_MAN.play("click")
@@ -97,4 +130,5 @@ def scp_999_scene():
             return 1
 
 if __name__ == "__main__":
-    main_menu()
+    #main_menu()
+    power_generator_room()
