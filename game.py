@@ -3,7 +3,7 @@ from pygame import Vector2
 import pygame
 from sys import exit
 from random import randint
-from scps import SCP999, Generator, PowerUser
+from scps import SCP999, Generator, PowerUser, WaterPump, WaterUser
 from DSEngine.animated import AnimationSheet
 pygame.init()
 default_title="Project: SCP"
@@ -11,23 +11,27 @@ click_sound = AudioPlayer("beep.mp3")
 AUDIO_MAN = AudioManager(click=click_sound)
 SCPS = {}
 GENERATOR = Generator(100)
+WPUMP = WaterPump(100)
 
 def global_frame():
-    global GENERATOR
+    global GENERATOR, WPUMP
     GENERATOR.calc()
-    print(GENERATOR.blackout)
+    WPUMP.calc()
+    #print(GENERATOR.blackout)
 
 def init():
     global SCPS
     SCPS = {"999": SCP999(Vector2(640, 360))}
 
 def power_generator_room():
-    global default_title, AUDIO_MAN, GENERATOR
+    global default_title, AUDIO_MAN, GENERATOR, WPUMP
     window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
     text = Text2D("Power Generators", position=Vector2(530, 0))
     gen1 = Rect2D(1, position=Vector2(70, 70), size=Vector2(160, 160), color=(160, 160, 160))
     text1 = Text2D("Gen 1", position=Vector2(70, 70))
     exit_button = Button("Hub", position=Vector2(0, 0))
+    sink = WaterUser(WPUMP, 32.0)
+    sink.add_water_con()
     power_tracker = PowerUser(GENERATOR, 65)
     power_tracker.add_power_con()
     text.init(window)
