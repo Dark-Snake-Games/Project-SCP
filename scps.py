@@ -2,6 +2,31 @@ from DSEngine import *
 from pygame import Vector2
 from random import randint
 
+class WasteCollector:
+    def __init__(self, wfs) -> None:
+        self.wfs = wfs
+        self.waste = 0.0
+        self.speed = 0.5
+    
+    def calc(self):
+        if self.wfs.val >= 0+self.speed:
+            self.waste += self.wfs.val-self.speed
+            self.wfs.val -= self.speed
+
+class WasteFiltrationSystem:
+    def __init__(self, pump, max_cap: float) -> None:
+        self.pump = pump
+        self.cap = max_cap
+        self.val = 0.0
+        self.backed_up = False
+    
+    def calc(self):
+        self.val += self.pump.usage/100
+        if self.val > self.cap:
+            self.backed_up = True
+        else:
+            self.backed_up = False
+
 class WaterPump:
     def __init__(self, max_l: float):
         self.capacity = max_l

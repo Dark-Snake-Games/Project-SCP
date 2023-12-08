@@ -3,7 +3,7 @@ from pygame import Vector2
 import pygame
 from sys import exit
 from random import randint
-from scps import SCP999, Generator, PowerUser, WaterPump, WaterUser
+from scps import *
 from DSEngine.animated import AnimationSheet
 pygame.init()
 default_title="Project: SCP"
@@ -12,26 +12,41 @@ AUDIO_MAN = AudioManager(click=click_sound)
 SCPS = {}
 GENERATOR = Generator(100)
 WPUMP = WaterPump(100)
+WFS = WasteFiltrationSystem(WPUMP, 1000)
+WCOLL = WasteCollector(WFS)
 
 def global_frame():
-    global GENERATOR, WPUMP
+    global GENERATOR, WPUMP, WFS, WCOLL
     GENERATOR.calc()
     WPUMP.calc()
+    WFS.calc()
+    WCOLL.calc()
+    print(WFS.val, WCOLL.waste, WPUMP.usage)
     #print(GENERATOR.blackout)
 
 def init():
     global SCPS
     SCPS = {"999": SCP999(Vector2(640, 360))}
 
-def power_generator_room():
+def testing():
     global default_title, AUDIO_MAN, GENERATOR, WPUMP
+    window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
+    sink = WaterUser(WPUMP, 32.0)
+    sink.add_water_con()
+    power_tracker = PowerUser(GENERATOR, 65)
+    power_tracker.add_power_con()
+    while window.running:
+        keys = window.frame()
+        if keys != None:
+            global_frame()
+
+def power_generator_room():
+    global default_title, AUDIO_MAN, GENERATOR
     window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
     text = Text2D("Power Generators", position=Vector2(530, 0))
     gen1 = Rect2D(1, position=Vector2(70, 70), size=Vector2(160, 160), color=(160, 160, 160))
     text1 = Text2D("Gen 1", position=Vector2(70, 70))
     exit_button = Button("Hub", position=Vector2(0, 0))
-    sink = WaterUser(WPUMP, 32.0)
-    sink.add_water_con()
     power_tracker = PowerUser(GENERATOR, 65)
     power_tracker.add_power_con()
     text.init(window)
@@ -135,4 +150,4 @@ def scp_999_scene():
 
 if __name__ == "__main__":
     #main_menu()
-    power_generator_room()
+    testing()
