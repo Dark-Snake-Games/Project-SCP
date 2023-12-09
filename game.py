@@ -14,6 +14,7 @@ GENERATOR = Generator(100)
 WPUMP = WaterPump(100)
 WFS = WasteFiltrationSystem(WPUMP, 1000)
 WCOLL = WasteCollector(WFS)
+MONEY = 500
 
 def global_frame():
     global GENERATOR, WPUMP, WFS, WCOLL
@@ -149,5 +150,5 @@ def scp_999_scene():
             return 1
 
 if __name__ == "__main__":
-    #main_menu()
-    testing()
+    main_menu()
+    #testing()
