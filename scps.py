@@ -2,6 +2,15 @@ from DSEngine import *
 from pygame import Vector2
 from random import randint
 
+class GameTime:
+    def __init__(self, rt_milis):
+        self.rt_milis = rt_milis
+        self.rt_secs = rt_milis/1000
+        self.rt_mins = self.rt_secs/60
+        self.hours = int(self.rt_secs/15)
+        self.days = int(self.hours/24)
+        
+
 class WasteCollector:
     def __init__(self, wfs) -> None:
         self.wfs = wfs

@@ -15,14 +15,19 @@ WPUMP = WaterPump(100)
 WFS = WasteFiltrationSystem(WPUMP, 1000)
 WCOLL = WasteCollector(WFS)
 MONEY = 500
+GT = GameTime(1)
+MILIS = 0
 
-def global_frame():
-    global GENERATOR, WPUMP, WFS, WCOLL
+def global_frame(win):
+    global GENERATOR, WPUMP, WFS, WCOLL, GT, MILIS
     GENERATOR.calc()
     WPUMP.calc()
     WFS.calc()
     WCOLL.calc()
-    print(WFS.val, WCOLL.waste, WPUMP.usage)
+    #print(WFS.val, WCOLL.waste, WPUMP.usage)
+    MILIS += win.delta
+    GT = GameTime(MILIS)
+    print(GT.hours, GT.days)
     #print(GENERATOR.blackout)
 
 def init():
@@ -56,7 +61,7 @@ def power_generator_room():
     text1.init(window)
     while window.running:
         keys = window.frame()
-        global_frame()
+        global_frame(window)
         if keys[27]:
             #exit(1)
             pass
@@ -140,7 +145,7 @@ def scp_999_scene():
     scp.move_towards(pos)
     while window.running:
         keys = window.frame()
-        global_frame()
+        global_frame(window)
         SCPS["999"] = scp
         if exit_button.pressed:
             AUDIO_MAN.play("click")
