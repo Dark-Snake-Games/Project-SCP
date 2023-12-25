@@ -4,7 +4,7 @@ import pygame
 from sys import exit
 from random import randint
 from scps import *
-from DSEngine.animated import AnimationSheet
+from os.path import exists
 pygame.init()
 default_title="Project: SCP"
 click_sound = AudioPlayer("beep.mp3")
@@ -25,14 +25,31 @@ def global_frame(win):
     WFS.calc()
     WCOLL.calc()
     #print(WFS.val, WCOLL.waste, WPUMP.usage)
-    MILIS += win.delta
-    GT = GameTime(MILIS)
-    print(GT.hours, GT.days)
+    GT.update_milis(win.delta)
+    print(GT.rt_milis, GT.hours, GT.days)
     #print(GENERATOR.blackout)
+
+def save_game():
+    global SCPS, GT
+    data = {}
+    data['SCP'] = {}
+    data['SCP']['999'] = SCPS["999"].to_json()
+    data['GT'] = GT.to_json()
+    save('.sav', data)
+
+def load_game():
+    global SCPS, GT
+    if exists(".sav"):
+        data = load('.sav')
+        SCPS["999"].import_json(data["SCP"]["999"])
+        GT.import_json(data['GT'])
+    else:
+        return None
 
 def init():
     global SCPS
     SCPS = {"999": SCP999(Vector2(640, 360))}
+    load_game()
 
 def testing():
     global default_title, AUDIO_MAN, GENERATOR, WPUMP
@@ -99,24 +116,29 @@ def main_menu():
 
 def hub():
     global default_title, AUDIO_MAN
+    init()
     window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
     text = Text2D("Hub", position=Vector2(600, 0))
     scp999_button = Button("SCP-999", position=Vector2(0, 100))
     main_menu_button = Button("Main Menu", position=Vector2(0, scp999_button.rect.bottom-50))
+    save_button = Button("Save", position=Vector2(0, main_menu_button.rect.bottom-50))
     text.init(window)
     scp999_button.init(window)
     main_menu_button.init(window)
+    save_button.init(window)
     while window.running:
         keys = window.frame()
         if keys[27]:
             AUDIO_MAN.play("click")
-            #return 1
         elif scp999_button.pressed:
             AUDIO_MAN.play("click")
             scp_999_scene()
         elif main_menu_button.pressed:
             AUDIO_MAN.play("click")
             main_menu()
+        elif save_button.pressed:
+            AUDIO_MAN.play("click")
+            save_game()
         else:
             #print("Nothing pressed")
             pass
@@ -124,7 +146,6 @@ def hub():
 def scp_999_scene():
     global default_title, AUDIO_MAN, SCPS
     window = Window(title=default_title, fps=120, size=(1280, 720), bg=(100, 100, 100))
-    init()
     exit_button = Button("Hub", position=Vector2(0, 0))
     wall_left = Rect2D(1, position=Vector2(0, 0), size=Vector2(5, 720))
     wall_right = Rect2D(1, position=Vector2(1275, 0), size=Vector2(5, 720))

@@ -6,10 +6,38 @@ class GameTime:
     def __init__(self, rt_milis):
         self.rt_milis = rt_milis
         self.rt_secs = rt_milis/1000
-        self.rt_mins = self.rt_secs/60
         self.hours = int(self.rt_secs/15)
         self.days = int(self.hours/24)
-        
+    
+    def update_milis(self, milis):
+        self.rt_milis += milis
+        self.rt_secs = self.rt_milis/1000
+        self.hours = int(self.rt_secs/15)
+        self.days = int(self.hours/24)
+    
+    def to_json(self):
+        data = {}
+        data['rt_milis'] = self.rt_milis
+        data['hours'] = self.hours
+        data['days'] = self.days
+        return data
+
+    def import_json(self, data: dict):
+        self.rt_milis = data['rt_milis']
+        self.hours = data['hours']
+        self.days = data['days']
+
+def vector2json(vec: Vector2):
+    data = {}
+    data['x'] = vec.x
+    data['y'] = vec.y
+    return data
+
+def json2vector(data: dict):
+    vec = Vector2()
+    vec.x = data['x']
+    vec.y = data['y']
+    return vec
 
 class WasteCollector:
     def __init__(self, wfs) -> None:
@@ -100,7 +128,20 @@ class SCP999(AnimatedSprite2D):
                                 SCP999_2,SCP999_2,SCP999_2,SCP999_2,SCP999_2,SCP999_2,SCP999_2,SCP999_2,SCP999_2,SCP999_2,SCP999_2,SCP999_2,)
         sheet = AnimationSheet(default=Image2D("Test.png"), walk=walk_sheet)
         self.last_secs = 0
+        self.move_pos = Vector2(0, 0)
         super().__init__(sheet, 1, position)
+    
+    def to_json(self):
+        data = {}
+        obj_pos = vector2json(self.position)
+        mov_pos = vector2json(self.move_pos)
+        data['pos'] = obj_pos
+        data['move_pos'] = mov_pos
+        return data
+    
+    def import_json(self, data: dict):
+        self.position = json2vector(data['pos'])
+        self.move_pos = json2vector(data['move_pos'])
     
     def render(self, window: Window):
         if self.moving_towards and not self.playing:
@@ -110,7 +151,7 @@ class SCP999(AnimatedSprite2D):
         if int(window.seconds-self.last_secs) >= 25:
             rx = randint(0, window.size[0])
             ry = randint(0, window.size[1])
-            pos = Vector2(rx, ry)
-            self.move_towards(pos)
+            self.move_pos = Vector2(rx, ry)
+            self.move_towards(self.move_pos)
             self.last_secs = int(window.seconds)
         super().render(window)
