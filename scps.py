@@ -45,6 +45,13 @@ class WasteCollector:
         self.waste = 0.0
         self.speed = 0.5
     
+    def to_json(self):
+        data = {}
+        data["filt"] = self.wfs.to_json()
+        data['waste'] = self.waste
+        data['speed'] = self.speed
+        return data
+    
     def calc(self):
         if self.wfs.val >= 0+self.speed:
             self.waste += self.wfs.val-self.speed
@@ -56,6 +63,14 @@ class WasteFiltrationSystem:
         self.cap = max_cap
         self.val = 0.0
         self.backed_up = False
+    
+    def to_json(self):
+        data = {}
+        data['pump'] = self.pump.to_json()
+        data['cap'] = self.cap
+        data['val'] = self.val
+        data['backed_up'] = self.backed_up
+        return data
     
     def calc(self):
         self.val += self.pump.usage/100
@@ -69,6 +84,17 @@ class WaterPump:
         self.capacity = max_l
         self.usage = 0.0
         self.cannot_handle = False
+        self.users = []
+    
+    def to_json(self):
+        data = {}
+        data['cap'] = self.capacity
+        data['usage'] = self.usage
+        data['handle'] = self.cannot_handle
+        data['users'] = []
+        for user in self.users:
+            data['users'].append(user.to_json())
+        return data
         
     def calc(self):
         if self.usage > self.capacity/2:
@@ -81,14 +107,22 @@ class WaterUser:
         self.con = False
         self.consuming = power
         self.pump = pump
+    
+    def to_json(self):
+        data = {}
+        data['con'] = self.con
+        data['value'] = self.consuming
+        return data
 
     def add_water_con(self):
         if not self.con:
+            self.pump.users.append(self)
             self.pump.usage += self.consuming
             self.con = True
 
     def remove_water_con(self):
         if self.con:
+            self.pump.users.remove(self)
             self.pump.usage -= self.consuming
             self.con = False
 
@@ -97,6 +131,17 @@ class Generator:
         self.total_pow = total_power
         self.consuming_power = 0.0
         self.blackout = False
+        self.users = []
+    
+    def to_json(self):
+        data = {}
+        data['power'] = self.total_pow
+        data['power_usage'] = self.consuming_power
+        data['blackout'] = self.blackout
+        data['users'] = []
+        for user in self.users:
+            data['users'].append(user.to_json())
+        return data
 
     def calc(self):
         if self.consuming_power > self.total_pow/2:
@@ -109,14 +154,22 @@ class PowerUser:
         self.con = False
         self.consuming = power
         self.generator = generator
+    
+    def to_json(self):
+        data = {}
+        data['con'] = self.con
+        data['pow'] = self.consuming
+        return data
 
     def add_power_con(self):
         if not self.con:
+            self.generator.users.append(self)
             self.generator.consuming_power += self.consuming
             self.con = True
 
     def remove_power_con(self):
         if self.con:
+            self.generator.users.remove(self)
             self.generator.consuming_power -= self.consuming
             self.con = False
 

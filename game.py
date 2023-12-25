@@ -30,11 +30,14 @@ def global_frame(win):
     #print(GENERATOR.blackout)
 
 def save_game():
-    global SCPS, GT
+    global SCPS, GT, MONEY, WCOLL, GENERATOR
     data = {}
     data['SCP'] = {}
     data['SCP']['999'] = SCPS["999"].to_json()
     data['GT'] = GT.to_json()
+    data['WCOLL'] = WCOLL.to_json()
+    data['GEN'] = GENERATOR.to_json()
+    data['MONEY'] = MONEY
     save('.sav', data)
 
 def load_game():
