@@ -11,15 +11,13 @@ click_sound = AudioPlayer("beep.mp3")
 AUDIO_MAN = AudioManager(click=click_sound)
 SCPS = {}
 GENERATOR = Generator(100)
-WPUMP = WaterPump(100)
-WFS = WasteFiltrationSystem(WPUMP, 1000)
-WCOLL = WasteCollector(WFS)
 MONEY = 500
 GT = GameTime(1)
 MILIS = 0
 
 def global_frame(win):
     global GENERATOR, WPUMP, WFS, WCOLL, GT, MILIS
+    save_game()
     GENERATOR.calc()
     WPUMP.calc()
     WFS.calc()
@@ -50,8 +48,11 @@ def load_game():
         return None
 
 def init():
-    global SCPS
+    global SCPS, WPUMP, WFS, WCOLL
     SCPS = {"999": SCP999(Vector2(640, 360))}
+    WPUMP = WaterPump(100)
+    WFS = WasteFiltrationSystem(WPUMP, 1000)
+    WCOLL = WasteCollector(WFS)
     load_game()
 
 def testing():
@@ -131,6 +132,7 @@ def hub():
     save_button.init(window)
     while window.running:
         keys = window.frame()
+        save_game()
         if keys[27]:
             AUDIO_MAN.play("click")
         elif scp999_button.pressed:

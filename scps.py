@@ -1,6 +1,9 @@
 from DSEngine import *
 from pygame import Vector2
 from random import randint
+WPUMP = None
+WFS = None
+WCOLL = None
 
 class GameTime:
     def __init__(self, rt_milis):
@@ -51,6 +54,12 @@ class WasteCollector:
         data['waste'] = self.waste
         data['speed'] = self.speed
         return data
+
+    def import_json(self, data: dict):
+        self.wfs = WasteFiltrationSystem(None, 0).import_json(data['filt'])
+        self.waste = data['waste']
+        self.speed = data['speed']
+        return self
     
     def calc(self):
         if self.wfs.val >= 0+self.speed:
@@ -71,6 +80,13 @@ class WasteFiltrationSystem:
         data['val'] = self.val
         data['backed_up'] = self.backed_up
         return data
+
+    def import_json(self, data: dict):
+        self.pump = WaterPump(0).import_json(data['pump'])
+        self.cap = data['cap']
+        self.val = data['val']
+        self.backed_up = data['backed_up']
+        return self
     
     def calc(self):
         self.val += self.pump.usage/100
@@ -95,6 +111,15 @@ class WaterPump:
         for user in self.users:
             data['users'].append(user.to_json())
         return data
+    
+    def import_json(self, data: dict):
+        self.capacity = data['cap']
+        self.usage = data['usage']
+        self.cannot_handle = data['handle']
+        for user in data['users']:
+            u = WaterUser(self, 0).import_json(user)
+            self.users.append(u)
+        return self
         
     def calc(self):
         if self.usage > self.capacity/2:
@@ -113,6 +138,11 @@ class WaterUser:
         data['con'] = self.con
         data['value'] = self.consuming
         return data
+    
+    def import_json(self, data: dict):
+        self.con = data['con']
+        self.consuming = data['value']
+        return self
 
     def add_water_con(self):
         if not self.con:
@@ -142,6 +172,15 @@ class Generator:
         for user in self.users:
             data['users'].append(user.to_json())
         return data
+
+    def import_json(self, data: dict):
+        self.total_pow = data['power']
+        self.consuming_power = data['power_usage']
+        self.blackout = data['blackout']
+        for user in data['users']:
+            u = PowerUser(self, 0).import_json(user)
+            self.users.append(u)
+        return self
 
     def calc(self):
         if self.consuming_power > self.total_pow/2:
